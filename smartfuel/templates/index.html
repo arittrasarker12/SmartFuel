@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFuel - Intelligent Fuel Availability Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- ============================================================== -->
+    <!-- SCREEN 1: DEDICATED LOGIN / SIGN UP PAGE (SHOWN FIRST)         -->
+    <!-- ============================================================== -->
+    <div id="authScreen" class="min-h-screen bg-slate-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+        <!-- Background Glow Accents -->
+        <div class="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="sm:mx-auto sm:w-full sm:max-w-md text-center relative z-10">
+            <!-- App Logo -->
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-400 p-0.5 shadow-xl shadow-emerald-500/20 mb-4 animate-bounce-slow">
+                <div class="w-full h-full bg-slate-900 rounded-[22px] flex items-center justify-center">
+                    <i class="fa-solid fa-gas-pump text-3xl text-emerald-400"></i>
+                </div>
+            </div>
+
+            <!-- App Name & Branding -->
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+                <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+                    SmartFuel
+                </span>
+            </h1>
+            <p class="mt-2 text-sm text-slate-400 max-w-sm mx-auto">
+                Intelligent Fuel Availability & Station Management Platform
+            </p>
+            <span class="inline-block mt-2 px-3 py-1 text-[11px] font-semibold text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 rounded-full">
+                DIU SWE Capstone • Group JESTER
+            </span>
+        </div>
+
+        <!-- Auth Card -->
+        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4">
+            <div class="bg-slate-800/90 backdrop-blur-md border border-slate-700/70 py-8 px-6 shadow-2xl rounded-3xl sm:px-10">
+                
+                <!-- Quick Demo Switcher -->
+                <div class="mb-6 p-3.5 bg-slate-900/80 rounded-2xl border border-slate-700/80">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center">
+                            <i class="fa-solid fa-bolt mr-1.5 text-amber-400"></i> 1-Click Demo Evaluation:
+                        </span>
+                        <span class="text-[10px] text-slate-400">Instant test</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="fillDemoCredentials('admin')" class="py-1.5 px-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-purple-900/40 text-purple-300 border border-purple-500/30 hover:border-purple-400 transition-all text-center">
+                            Admin
+                        </button>
+                        <button type="button" onclick="fillDemoCredentials('manager')" class="py-1.5 px-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-blue-900/40 text-blue-300 border border-blue-500/30 hover:border-blue-400 transition-all text-center">
+                            Manager
+                        </button>
+                        <button type="button" onclick="fillDemoCredentials('customer')" class="py-1.5 px-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-500/30 hover:border-emerald-400 transition-all text-center">
+                            Customer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabs: Sign In / Sign Up -->
+                <div class="flex bg-slate-900/60 p-1 rounded-2xl mb-6 border border-slate-700/50">
+                    <button type="button" id="tabBtnLogin" onclick="switchAuthTab('login')" class="w-1/2 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all bg-emerald-600 text-white shadow-md">
+                        Sign In
+                    </button>
+                    <button type="button" id="tabBtnRegister" onclick="switchAuthTab('register')" class="w-1/2 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-slate-400 hover:text-white">
+                        Sign Up
+                    </button>
+                </div>
+
+                <!-- Sign In Form -->
+                <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                <i class="fa-regular fa-envelope text-sm"></i>
+                            </span>
+                            <input type="email" id="loginEmail" required placeholder="name@example.com"
+                                   class="w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder-slate-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 pointer-events-none">
+                                <i class="fa-solid fa-lock text-sm"></i>
+                            </span>
+                            <input type="password" id="loginPassword" required placeholder="••••••••"
+                                   class="w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent placeholder-slate-500">
+                        </div>
+                    </div>
+                    <div id="loginError" class="p-3 bg-rose-950/50 border border-rose-500/40 rounded-xl text-xs text-rose-300 hidden font-medium"></div>
+                    <button type="submit" id="loginSubmitBtn" class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center space-x-2">
+                        <span>Sign In to Dashboard</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-3.5 hidden max-h-[60vh] overflow-y-auto pr-1">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+                        <input type="text" id="regName" required placeholder="e.g. Tanvir Ahmed"
+                               class="w-full px-3.5 py-2 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                        <input type="email" id="regEmail" required placeholder="e.g. user@gmail.com"
+                               class="w-full px-3.5 py-2 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Phone Number</label>
+                        <input type="tel" id="regPhone" placeholder="017xxxxxxxx"
+                               class="w-full px-3.5 py-2 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Password (min 6 chars, alphanumeric)</label>
+                        <input type="password" id="regPassword" required placeholder="••••••••"
+                               class="w-full px-3.5 py-2 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Account Role</label>
+                        <select id="regRole" onchange="toggleStationFields(this.value)" class="w-full px-3.5 py-2 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <option value="customer">Customer (Vehicle Owner / Driver)</option>
+                            <option value="manager">Station Manager (Fuel Station Operator)</option>
+                            <option value="admin">Administrator (Platform Admin / BPC)</option>
+                        </select>
+                    </div>
+
+                    <!-- Admin Notice -->
+                    <div id="adminNoticeBox" class="p-3 bg-purple-950/60 border border-purple-500/40 rounded-xl text-xs text-purple-200 space-y-1 hidden">
+                        <div class="flex items-center space-x-1.5 font-bold text-purple-300">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Administrator Privileges</span>
+                        </div>
+                        <p class="text-[11px] text-slate-300">
+                            Signing up as Administrator will grant you full access to verify fuel stations, monitor sales, and manage official BPC fuel prices.
+                        </p>
+                    </div>
+
+                    <!-- Station Manager Specific Fields -->
+                    <div id="stationManagerFields" class="space-y-3 pt-2 border-t border-slate-700/80 hidden">
+                        <span class="text-xs font-bold text-teal-400 block">Station Details (SRS FR-A1)</span>
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1">Station Name</label>
+                            <input type="text" id="regStationName" placeholder="e.g. Meghna Petroleum Mirpur"
+                                   class="w-full px-3 py-1.5 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1">Address</label>
+                            <input type="text" id="regStationAddress" placeholder="e.g. Mirpur 1, Dhaka"
+                                   class="w-full px-3 py-1.5 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-300 mb-1">Trade / License Number</label>
+                            <input type="text" id="regLicenseNo" placeholder="e.g. DHK-EXP-2026-1102"
+                                   class="w-full px-3 py-1.5 text-sm bg-slate-900/80 border border-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        </div>
+                    </div>
+
+                    <div id="regError" class="p-3 bg-rose-950/50 border border-rose-500/40 rounded-xl text-xs text-rose-300 hidden font-medium"></div>
+
+                    <button type="submit" id="regSubmitBtn" class="w-full mt-2 py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center space-x-2">
+                        <span>Create Account & Continue</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-5 border-t border-slate-700/60 text-center">
+                    <p class="text-[11px] text-slate-400 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                        <span>Secured with Salted PBKDF2 Hashing (No hardcoded credentials)</span>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SCREEN 2: MAIN HOME & DASHBOARDS (APPEARS AFTER LOGIN/SIGNUP)  -->
+    <!-- ============================================================== -->
+    <div id="appScreen" class="min-h-screen flex flex-col hidden">
+        <!-- Top Navigation Header -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer group" onclick="navigateTo('customer')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-gas-pump text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">SmartFuel</span>
+                        <span class="text-xs block text-slate-400 font-medium -mt-1">DIU SWE • Group JESTER</span>
+                    </div>
+                </div>
+
+                <!-- Role View Switcher Navigation -->
+                <nav id="navTabs" class="hidden md:flex items-center space-x-1 bg-slate-100 p-1 rounded-xl">
+                    <button onclick="navigateTo('customer')" id="tabCustomer" class="nav-tab px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                        <i class="fa-solid fa-car mr-1.5 text-emerald-600"></i> Customer View
+                    </button>
+                    <button onclick="navigateTo('manager')" id="tabManager" class="nav-tab px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                        <i class="fa-solid fa-charging-station mr-1.5 text-blue-600"></i> Station Manager
+                    </button>
+                    <button onclick="navigateTo('admin')" id="tabAdmin" class="nav-tab px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                        <i class="fa-solid fa-shield-halved mr-1.5 text-purple-600"></i> Admin Panel
+                    </button>
+                </nav>
+
+                <!-- User Profile & Log Out Button -->
+                <div class="flex items-center space-x-3">
+                    <div id="userBadge" class="flex items-center space-x-2 text-sm">
+                        <div class="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 shadow-xs" id="userAvatar">U</div>
+                        <div class="text-left hidden sm:block">
+                            <div class="font-bold text-slate-800 leading-tight text-xs sm:text-sm" id="userNameDisplay">User</div>
+                            <span class="inline-block text-[10px] uppercase tracking-wider font-extrabold px-1.5 py-0.2 rounded border bg-emerald-100 text-emerald-700 border-emerald-200" id="userRoleDisplay">ROLE</span>
+                        </div>
+                        <button onclick="handleLogout()" title="Log Out (Return to Login page)" class="ml-2 flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all shadow-xs">
+                            <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+                            <span class="hidden sm:inline">Log Out</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Mobile Nav Bar -->
+        <div class="md:hidden bg-white border-b border-slate-200 px-4 py-2 flex justify-around text-xs font-semibold">
+            <button onclick="navigateTo('customer')" class="flex flex-col items-center py-1 text-slate-600 hover:text-emerald-600">
+                <i class="fa-solid fa-car text-base mb-0.5"></i> Customer
+            </button>
+            <button onclick="navigateTo('manager')" class="flex flex-col items-center py-1 text-slate-600 hover:text-blue-600">
+                <i class="fa-solid fa-charging-station text-base mb-0.5"></i> Manager
+            </button>
+            <button onclick="navigateTo('admin')" class="flex flex-col items-center py-1 text-slate-600 hover:text-purple-600">
+                <i class="fa-solid fa-shield-halved text-base mb-0.5"></i> Admin
+            </button>
+        </div>
+
+        <!-- Main Content Dynamic Views -->
+        <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+            <!-- ============================================================== -->
+            <!-- VIEW 1: CUSTOMER VIEW (Feature 3: View Fuel Availability)       -->
+            <!-- ============================================================== -->
+            <section id="viewCustomer" class="space-y-6">
+                <!-- Header & Summary Section (SRS FR-C7) -->
+                <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white rounded-2xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
+                    <div class="relative z-10 max-w-2xl">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 mb-3">
+                            <i class="fa-solid fa-satellite-dish mr-1.5 animate-pulse"></i> Live Fuel Monitoring (Dhaka Area)
+                        </span>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Real-Time Fuel Availability</h1>
+                        <p class="mt-2 text-emerald-100 text-sm sm:text-base leading-relaxed">
+                            Find verified fuel stations across Dhaka with real-time stock levels, official BPC rates, and freshness verification.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- System-Wide Stock Summary (SRS FR-C7) -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-chart-pie text-emerald-600 mr-2"></i> System Stock Summary (Dhaka City)
+                        </h2>
+                        <span class="text-xs text-slate-500">Excludes stale (>6h) data</span>
+                    </div>
+                    <div id="systemStockSummary" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm animate-pulse h-28"></div>
+                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm animate-pulse h-28"></div>
+                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm animate-pulse h-28"></div>
+                    </div>
+                </div>
+
+                <!-- Filters & Search Toolbar (SRS FR-C3) -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
+                    <div class="relative w-full md:w-96">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="text" id="stationSearchInput" oninput="debounceSearch()" placeholder="Search station name or location (e.g. Dhanmondi)..." 
+                               class="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all">
+                    </div>
+
+                    <div class="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mr-1">Filter:</span>
+                        <button onclick="setGradeFilter('')" id="filterAll" class="filter-pill active-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                            All Grades
+                        </button>
+                        <button onclick="setGradeFilter('petrol')" id="filterPetrol" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                            Petrol
+                        </button>
+                        <button onclick="setGradeFilter('octane')" id="filterOctane" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                            Octane
+                        </button>
+                        <button onclick="setGradeFilter('diesel')" id="filterDiesel" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                            Diesel
+                        </button>
+                        <button onclick="loadCustomerStations()" title="Refresh" class="p-2 text-slate-400 hover:text-emerald-600 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">
+                            <i class="fa-solid fa-arrows-rotate text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Station Availability List -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 text-base flex items-center">
+                            <i class="fa-solid fa-location-dot text-emerald-600 mr-2"></i> Verified Stations & Available Litres
+                        </h3>
+                        <div class="text-xs text-slate-500 flex items-center space-x-3">
+                            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></span> Available</span>
+                            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-yellow-500 mr-1.5"></span> Low (≤20%)</span>
+                            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5"></span> Out</span>
+                            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1.5"></span> Stale (>6h)</span>
+                        </div>
+                    </div>
+
+                    <div id="customerStationsList" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================== -->
+            <!-- VIEW 2: STATION MANAGER VIEW (Feature 1 & Feature 2)           -->
+            <!-- ============================================================== -->
+            <section id="viewManager" class="space-y-6 hidden">
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            <span id="mgrStationStatusBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                Verified Station
+                            </span>
+                            <span class="text-xs text-slate-400 font-mono" id="mgrLicenseNo">LIC: DHK-EXP-2024-0012</span>
+                        </div>
+                        <h1 class="text-2xl font-extrabold text-slate-800 mt-1" id="mgrStationName">Station Manager Dashboard</h1>
+                        <p class="text-sm text-slate-500 flex items-center mt-1" id="mgrStationAddress">
+                            <i class="fa-solid fa-location-dot mr-1.5 text-slate-400"></i> House 32, Road 7/A, Dhanmondi, Dhaka
+                        </p>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button onclick="openInventoryUpdateModal()" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-all flex items-center">
+                            <i class="fa-solid fa-boxes-stacked mr-2"></i> Update Stock (Feature 1)
+                        </button>
+                        <button onclick="openSalesModal()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-sm transition-all flex items-center">
+                            <i class="fa-solid fa-cash-register mr-2"></i> Record Sale (Feature 2)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Feature 1: Current Fuel Inventory Cards -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-gas-pump text-blue-600 mr-2"></i> Current Fuel Inventory & Tank Capacities (SRS FR-S1)
+                        </h2>
+                        <button onclick="loadManagerData()" class="text-xs text-blue-600 hover:underline flex items-center">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh
+                        </button>
+                    </div>
+                    <div id="managerInventoryCards" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+                </div>
+
+                <!-- Feature 2: Sales Records and Audit Logs -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-slate-800 text-base flex items-center">
+                                <i class="fa-solid fa-receipt text-emerald-600 mr-2"></i> Recent Sales History (SRS FR-S2)
+                            </h3>
+                            <span class="text-xs bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full" id="salesCountBadge">0 Sales</span>
+                        </div>
+                        <div class="overflow-x-auto max-h-96">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider sticky top-0 border-b border-slate-200">
+                                    <tr>
+                                        <th class="py-2.5 px-3">Grade</th>
+                                        <th class="py-2.5 px-3">Litres Sold</th>
+                                        <th class="py-2.5 px-3">Unit Rate</th>
+                                        <th class="py-2.5 px-3">Total (BDT)</th>
+                                        <th class="py-2.5 px-3">Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="managerSalesTableBody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-slate-800 text-base flex items-center">
+                                <i class="fa-solid fa-clock-rotate-left text-blue-600 mr-2"></i> Inventory Audit Logs (SRS Table 7.4)
+                            </h3>
+                            <span class="text-xs bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded-full">Stock Audits</span>
+                        </div>
+                        <div class="overflow-x-auto max-h-96">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider sticky top-0 border-b border-slate-200">
+                                    <tr>
+                                        <th class="py-2.5 px-3">Action</th>
+                                        <th class="py-2.5 px-3">Grade</th>
+                                        <th class="py-2.5 px-3">Stock Level</th>
+                                        <th class="py-2.5 px-3">Updated By</th>
+                                        <th class="py-2.5 px-3">Recorded At</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="managerLogsTableBody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================== -->
+            <!-- VIEW 3: ADMIN PANEL (FR-A2, FR-A3, FR-D1, FR-D2, FR-S5)        -->
+            <!-- ============================================================== -->
+            <section id="viewAdmin" class="space-y-6 hidden">
+                <div class="bg-gradient-to-r from-purple-900 to-indigo-800 text-white rounded-2xl p-6 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-500/20 text-purple-200 border border-purple-400/30 mb-2">
+                            <i class="fa-solid fa-shield-halved mr-1.5"></i> Platform Administration (BPC & Operator)
+                        </span>
+                        <h1 class="text-2xl font-extrabold">SmartFuel System Administration</h1>
+                        <p class="text-purple-200 text-sm mt-1">Manage station approvals, enforce official fuel prices, and monitor city-wide fuel stats.</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="loadAdminData()" class="px-3.5 py-2 bg-purple-700/60 hover:bg-purple-600 rounded-lg text-xs font-semibold transition-all">
+                            <i class="fa-solid fa-arrows-rotate mr-1.5"></i> Refresh Stats
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="adminStatsGrid"></div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <h2 class="font-bold text-slate-800 text-base flex items-center mb-1">
+                        <i class="fa-solid fa-tags text-purple-600 mr-2"></i> Official BPC Fuel Prices (SRS FR-S5 & FR-D2)
+                    </h2>
+                    <p class="text-xs text-slate-500 mb-4">Only Admin can modify official prices. Changes update customer view and manager sales rate immediately.</p>
+                    <div id="adminPricesGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="font-bold text-slate-800 text-base flex items-center">
+                                <i class="fa-solid fa-building-circle-check text-purple-600 mr-2"></i> Station Verification & Approvals (SRS FR-A2)
+                            </h2>
+                            <p class="text-xs text-slate-500">Unverified stations remain completely hidden from Customers until approved here.</p>
+                        </div>
+                        <span class="text-xs bg-purple-50 text-purple-700 font-semibold px-2 py-0.5 rounded-full" id="adminStationCount">0 Stations</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3">Station Name</th>
+                                    <th class="py-3 px-3">License No</th>
+                                    <th class="py-3 px-3">Location</th>
+                                    <th class="py-3 px-3">Manager</th>
+                                    <th class="py-3 px-3">Status</th>
+                                    <th class="py-3 px-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminStationsTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-400">
+            <div class="max-w-7xl mx-auto px-4">
+                <p class="font-medium text-slate-600">AI-Based SmartFuel System • Department of SWE • Daffodil International University (DIU)</p>
+                <p class="mt-1">Course: SE331 Software Engineering Design Capstone Project • Group 07 (JESTER)</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 1: FEATURE 1 - UPDATE FUEL INVENTORY                     -->
+    <!-- ============================================================== -->
+    <div id="updateInventoryModal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Feature 1: Update Fuel Stock</h3>
+                    <p class="text-xs text-slate-500">SRS FR-S1 & FR-S3 • Validated against tank capacity</p>
+                </div>
+                <button onclick="closeInventoryUpdateModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleUpdateInventorySubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Fuel Grade</label>
+                    <select id="modalInvGradeSelect" onchange="onModalGradeChange(this.value)" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="1">Petrol</option>
+                        <option value="2">Octane</option>
+                        <option value="3">Diesel</option>
+                    </select>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Tank Capacity:</span>
+                        <span class="font-bold text-slate-800" id="modalInvTankCapacity">10,000 L</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Current Stock:</span>
+                        <span class="font-bold text-blue-600" id="modalInvCurrentStock">0 L</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">New Stock Level (Litres)</label>
+                    <div class="relative">
+                        <input type="number" id="modalInvNewLitres" step="0.1" min="0" required placeholder="e.g. 7500" 
+                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10">
+                        <span class="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400">LITRES</span>
+                    </div>
+                </div>
+                <div id="modalInvError" class="text-xs text-rose-600 hidden font-medium"></div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeInventoryUpdateModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-all">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Update Stock</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 2: FEATURE 2 - RECORD FUEL SALES                         -->
+    <!-- ============================================================== -->
+    <div id="recordSalesModal" class="modal-backdrop fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Feature 2: Record Fuel Sale</h3>
+                    <p class="text-xs text-slate-500">SRS FR-S2 & FR-S3 • Deducts stock & creates sales log</p>
+                </div>
+                <button onclick="closeSalesModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleRecordSaleSubmit(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Fuel Grade</label>
+                    <select id="modalSaleGradeSelect" onchange="onModalSaleGradeChange(this.value)" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="1">Petrol</option>
+                        <option value="2">Octane</option>
+                        <option value="3">Diesel</option>
+                    </select>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Available Stock:</span>
+                        <span class="font-bold text-emerald-700" id="modalSaleAvailableStock">0 L</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Official Rate:</span>
+                        <span class="font-bold text-slate-800" id="modalSaleOfficialRate">৳125.00 / L</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Litres Sold</label>
+                    <div class="relative">
+                        <input type="number" id="modalSaleLitres" step="0.1" min="0.1" required oninput="calculateSaleTotal()" placeholder="e.g. 50" 
+                               class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 pr-10">
+                        <span class="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400">LITRES</span>
+                    </div>
+                </div>
+                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 flex justify-between items-center">
+                    <span class="text-xs font-bold text-emerald-800">Total BDT Amount:</span>
+                    <span class="text-lg font-extrabold text-emerald-700" id="modalSaleTotalBdt">৳0.00</span>
+                </div>
+                <div id="modalSaleError" class="text-xs text-rose-600 hidden font-medium"></div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeSalesModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-all">Cancel</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-md transition-all">Confirm & Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
